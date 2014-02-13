@@ -35,7 +35,11 @@ final class ResourcePath implements Path {
   }
 
   @Override public Path getFileName() {
-    throw new UnsupportedOperationException();
+    String[] parts = uri.getPath().split(fileSystem.getSeparator());
+    if (parts.length == 0) {
+      return null;
+    }
+    return new ResourcePath(fileSystem, URI.create(parts[parts.length - 1]));
   }
 
   @Override public Path getParent() {
