@@ -24,7 +24,7 @@ final class ResourceFileSystem extends FileSystem {
     this.provider = requireNonNull(provider, "provider");
 
     rootDirectories = Collections.<Path>singletonList(new ResourcePath(this, URI.create("/")));
-    fileStores = Collections.<FileStore>singletonList(provider.fileStore);
+    fileStores = Collections.singletonList(provider.fileStore);
     supportedFileAttributeViews = Collections.singleton("basic");
   }
 
