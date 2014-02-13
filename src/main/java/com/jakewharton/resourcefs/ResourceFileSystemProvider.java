@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
@@ -30,6 +31,15 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   private final BasicFileAttributes fileAttributes = new ResourceFileAttributes();
   final FileStore fileStore = new ResourceFileStore();
 
+  private void checkExists(Path path) throws FileNotFoundException {
+    if (!path.isAbsolute()) {
+      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
+    }
+    if (getClass().getResource(path.toUri().toString()) == null) {
+      throw new FileNotFoundException(path.toUri().toString());
+    }
+  }
+
   @Override public String getScheme() {
     return SCHEME;
   }
@@ -50,14 +60,8 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   }
 
   @Override public InputStream newInputStream(Path path, OpenOption... options) throws IOException {
-    if (!path.isAbsolute()) {
-      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
-    }
-    InputStream is = getClass().getResourceAsStream(path.toUri().toString());
-    if (is == null) {
-      throw new FileNotFoundException(path.toUri().toString());
-    }
-    return is;
+    checkExists(path);
+    return getClass().getResourceAsStream(path.toUri().toString());
   }
 
   @Override public FileSystem newFileSystem(Path path, Map<String, ?> env) throws IOException {
@@ -109,15 +113,24 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   }
 
   @Override public boolean isHidden(Path path) throws IOException {
+    checkExists(path);
     return false;
   }
 
   @Override public FileStore getFileStore(Path path) throws IOException {
+    checkExists(path);
     return fileStore;
   }
 
   @Override public void checkAccess(Path path, AccessMode... modes) throws IOException {
-    throw new UnsupportedOperationException(); // TODO
+    checkExists(path);
+    for (AccessMode mode : modes) {
+      if (mode == AccessMode.WRITE) {
+        throw readOnly();
+      } else if (mode == AccessMode.EXECUTE) {
+        throw new AccessDeniedException("Resources are not executable.");
+      }
+    }
   }
 
   @Override public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type,
@@ -130,12 +143,14 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
     if (type != BasicFileAttributes.class) {
       throw new IllegalArgumentException("Unsupported attributes: " + type.getCanonicalName());
     }
+    checkExists(path);
     return type.cast(fileAttributes);
   }
 
   @Override
   public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
       throws IOException {
+    checkExists(path);
     return Collections.emptyMap(); // TODO
   }
 
