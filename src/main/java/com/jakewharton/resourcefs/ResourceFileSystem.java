@@ -15,10 +15,17 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 final class ResourceFileSystem extends FileSystem {
+  private final Iterable<Path> rootDirectories;
+  private final Iterable<FileStore> fileStores;
+  private final Set<String> supportedFileAttributeViews;
   private final ResourceFileSystemProvider provider;
 
   ResourceFileSystem(ResourceFileSystemProvider provider) {
     this.provider = requireNonNull(provider, "provider");
+
+    rootDirectories = Collections.<Path>singletonList(new ResourcePath(this, URI.create("/")));
+    fileStores = Collections.<FileStore>singletonList(provider.fileStore);
+    supportedFileAttributeViews = Collections.singleton("basic");
   }
 
   @Override public FileSystemProvider provider() {
@@ -41,15 +48,15 @@ final class ResourceFileSystem extends FileSystem {
   }
 
   @Override public Iterable<Path> getRootDirectories() {
-    return Collections.<Path>singletonList(new ResourcePath(this, URI.create("/")));
+    return rootDirectories;
   }
 
   @Override public Iterable<FileStore> getFileStores() {
-    return null; // TODO
+    return fileStores;
   }
 
   @Override public Set<String> supportedFileAttributeViews() {
-    return Collections.singleton("basic");
+    return supportedFileAttributeViews;
   }
 
   @Override public Path getPath(String first, String... more) {
