@@ -75,11 +75,19 @@ final class ResourcePath implements Path {
   }
 
   @Override public Path resolve(Path other) {
-    throw new UnsupportedOperationException();
+    if (other.isAbsolute()) {
+      return other;
+    }
+    URI newUri = URI.create(uri.toString() + other.toUri().toString());
+    return new ResourcePath(fileSystem, newUri);
   }
 
   @Override public Path resolve(String other) {
-    throw new UnsupportedOperationException();
+    if (other.startsWith(fileSystem.getSeparator())) {
+      return new ResourcePath(fileSystem, URI.create(other));
+    }
+    URI newUri = URI.create(uri.toString() + other);
+    return new ResourcePath(fileSystem, newUri);
   }
 
   @Override public Path resolveSibling(Path other) {
