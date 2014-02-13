@@ -50,7 +50,14 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   }
 
   @Override public InputStream newInputStream(Path path, OpenOption... options) throws IOException {
-    return getClass().getResourceAsStream(path.toUri().toString());
+    if (!path.isAbsolute()) {
+      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
+    }
+    InputStream is = getClass().getResourceAsStream(path.toUri().toString());
+    if (is == null) {
+      throw new FileNotFoundException(path.toUri().toString());
+    }
+    return is;
   }
 
   @Override public FileSystem newFileSystem(Path path, Map<String, ?> env) throws IOException {
@@ -70,13 +77,7 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   @Override
   public SeekableByteChannel newByteChannel(final Path path, Set<? extends OpenOption> options,
       FileAttribute<?>... attrs) throws IOException {
-    if (!path.isAbsolute()) {
-      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
-    }
-    InputStream is = getClass().getResourceAsStream(path.toUri().toString());
-    if (is == null) {
-      throw new FileNotFoundException(path.toUri().toString());
-    }
+    InputStream is = newInputStream(path);
     byte[] bytes = Streams.toByteArray(is);
     return new SeekableByteArrayChannel(bytes);
   }
