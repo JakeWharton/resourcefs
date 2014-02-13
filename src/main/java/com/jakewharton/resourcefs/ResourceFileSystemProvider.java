@@ -26,9 +26,9 @@ import java.util.Set;
 public final class ResourceFileSystemProvider extends FileSystemProvider {
   static final String SCHEME = "resource";
 
-  private final ResourceFileSystem fileSystem = new ResourceFileSystem(this);
-  private final ResourceFileAttributes fileAttributes = new ResourceFileAttributes();
-  final ResourceFileStore fileStore = new ResourceFileStore();
+  private final FileSystem fileSystem = new ResourceFileSystem(this);
+  private final BasicFileAttributes fileAttributes = new ResourceFileAttributes();
+  final FileStore fileStore = new ResourceFileStore();
 
   @Override public String getScheme() {
     return SCHEME;
