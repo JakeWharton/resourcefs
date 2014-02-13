@@ -139,4 +139,8 @@ final class ResourcePath implements Path {
   @Override public int hashCode() {
     return uri.hashCode();
   }
+
+  @Override public String toString() {
+    return uri.toString();
+  }
 }
