@@ -28,7 +28,6 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   static final String SCHEME = "resource";
 
   private final FileSystem fileSystem = new ResourceFileSystem(this);
-  private final BasicFileAttributes fileAttributes = new ResourceFileAttributes();
   final FileStore fileStore = new ResourceFileStore();
 
   private void checkExists(Path path) throws FileNotFoundException {
@@ -144,7 +143,7 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
       throw new IllegalArgumentException("Unsupported attributes: " + type.getCanonicalName());
     }
     checkExists(path);
-    return type.cast(fileAttributes);
+    return type.cast(new ResourceFileAttributes(path, fileSystem));
   }
 
   @Override

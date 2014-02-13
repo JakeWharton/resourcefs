@@ -1,5 +1,7 @@
 package com.jakewharton.resourcefs;
 
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
@@ -7,6 +9,14 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 final class ResourceFileAttributes implements BasicFileAttributes {
   private static final FileTime TIME = FileTime.from(0, SECONDS);
+
+  private final Path path;
+  private final FileSystem fileSystem;
+
+  ResourceFileAttributes(Path path, FileSystem fileSystem) {
+    this.path = path;
+    this.fileSystem = fileSystem;
+  }
 
   @Override public FileTime lastModifiedTime() {
     return TIME;
@@ -21,11 +31,11 @@ final class ResourceFileAttributes implements BasicFileAttributes {
   }
 
   @Override public boolean isRegularFile() {
-    return true;
+    return !isDirectory();
   }
 
   @Override public boolean isDirectory() {
-    return false;
+    return path.toUri().toString().endsWith(fileSystem.getSeparator());
   }
 
   @Override public boolean isSymbolicLink() {
