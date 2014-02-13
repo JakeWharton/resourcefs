@@ -28,6 +28,7 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
 
   private final ResourceFileSystem fileSystem = new ResourceFileSystem(this);
   private final ResourceFileStore fileStore = new ResourceFileStore();
+  private final ResourceFileAttributes fileAttributes = new ResourceFileAttributes();
 
   @Override public String getScheme() {
     return SCHEME;
@@ -124,7 +125,10 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
 
   @Override public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type,
       LinkOption... options) throws IOException {
-    throw new UnsupportedOperationException(); // TODO
+    if (type != BasicFileAttributes.class) {
+      throw new IllegalArgumentException("Unsupported attributes: " + type.getCanonicalName());
+    }
+    return type.cast(fileAttributes);
   }
 
   @Override
