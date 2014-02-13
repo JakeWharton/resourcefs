@@ -103,7 +103,7 @@ final class ResourcePath implements Path {
   }
 
   @Override public Path toRealPath(LinkOption... options) throws IOException {
-    throw new UnsupportedOperationException();
+    return this;
   }
 
   @Override public File toFile() {
