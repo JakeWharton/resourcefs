@@ -10,7 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 
-public class ResourceFileSystemProviderTest {
+public class ResourceFileSystemsTest {
   private FileSystem fs;
 
   @Before public void setUp() throws IOException {
