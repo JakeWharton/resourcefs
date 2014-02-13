@@ -77,9 +77,10 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   @Override
   public SeekableByteChannel newByteChannel(final Path path, Set<? extends OpenOption> options,
       FileAttribute<?>... attrs) throws IOException {
-    InputStream is = newInputStream(path);
-    byte[] bytes = Streams.toByteArray(is);
-    return new SeekableByteArrayChannel(bytes);
+    try (InputStream is = newInputStream(path)) {
+      byte[] bytes = Streams.toByteArray(is);
+      return new SeekableByteArrayChannel(bytes);
+    }
   }
 
   @Override public DirectoryStream<Path> newDirectoryStream(Path dir,
