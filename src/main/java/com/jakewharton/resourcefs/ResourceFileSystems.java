@@ -14,7 +14,7 @@ public final class ResourceFileSystems {
     try {
       URI uri = URI.create(SCHEME + ":none");
       Map<String, ?> env = Collections.emptyMap();
-      return FileSystems.newFileSystem(uri, env);
+      return FileSystems.newFileSystem(uri, env, ResourceFileSystem.class.getClassLoader());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
