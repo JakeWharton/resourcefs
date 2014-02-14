@@ -30,15 +30,6 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   private final FileSystem fileSystem = new ResourceFileSystem(this);
   final FileStore fileStore = new ResourceFileStore();
 
-  private void checkExists(Path path) throws FileNotFoundException {
-    if (!path.isAbsolute()) {
-      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
-    }
-    if (getClass().getResource(path.toUri().toString()) == null) {
-      throw new FileNotFoundException(path.toUri().toString());
-    }
-  }
-
   @Override public String getScheme() {
     return SCHEME;
   }
@@ -59,7 +50,12 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   }
 
   @Override public InputStream newInputStream(Path path, OpenOption... options) throws IOException {
-    checkExists(path);
+    if (!path.isAbsolute()) {
+      throw new IllegalArgumentException("Only absolute paths allowed: " + path.toUri().toString());
+    }
+    if (getClass().getResource(path.toUri().toString()) == null) {
+      throw new FileNotFoundException(path.toUri().toString());
+    }
     return getClass().getResourceAsStream(path.toUri().toString());
   }
 
@@ -112,17 +108,14 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
   }
 
   @Override public boolean isHidden(Path path) throws IOException {
-    checkExists(path);
     return false;
   }
 
   @Override public FileStore getFileStore(Path path) throws IOException {
-    checkExists(path);
     return fileStore;
   }
 
   @Override public void checkAccess(Path path, AccessMode... modes) throws IOException {
-    checkExists(path);
     for (AccessMode mode : modes) {
       if (mode == AccessMode.WRITE) {
         throw readOnly();
@@ -142,14 +135,12 @@ public final class ResourceFileSystemProvider extends FileSystemProvider {
     if (type != BasicFileAttributes.class) {
       throw new IllegalArgumentException("Unsupported attributes: " + type.getCanonicalName());
     }
-    checkExists(path);
     return type.cast(new ResourceFileAttributes(path, fileSystem));
   }
 
   @Override
   public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
       throws IOException {
-    checkExists(path);
     return Collections.emptyMap(); // TODO
   }
 
