@@ -14,6 +14,13 @@ FileSystem fs = ResourceFileSystems.create();
 
 
 
+Download
+--------
+
+Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
+
+
+
 License
 -------
 
@@ -35,3 +42,4 @@ License
 
 
  [fs]: http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html
+ [snap]: https://oss.sonatype.org/content/repositories/snapshots/
